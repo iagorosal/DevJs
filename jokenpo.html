@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="Pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Jokenpô</title>
+    <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #383844;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+            url('https://raw.githubusercontent.com/iagorosal/Curso_Python/refs/heads/main/jokenpo.jfif');
+            background-size: cover;       
+            background-position: center;  
+            background-repeat: no-repeat;            
+        }
+        #container {
+            background-color: #2a2a40;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            max-width: 400px;
+            width: 90%;
+        }
+        .placar {
+            display: flex;
+            justify-content: space-around;
+            background-color: #1e1e2e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #botoes {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin: 20px 0;
+        }
+        button {
+            font-size: 40px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: #3b3b58;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        button:hover {
+            transform: scale(1.1);
+            background-color: #505078;
+        }
+        #resultado {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            min-height: 28px;
+        }
+        #detalhes {
+            color: #b0b0cc;
+            margin-top: 8px;
+            font-size: 15px;
+        }
+
+        .modal-overlay {
+            display: none; /* Começa escondido */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        /* A caixa da janela no centro da tela */
+        .modal-box {
+            background-color: #2a2a40;
+            padding: 35px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border: 2px solid #505078;
+            max-width: 320px;
+            width: 85%;
+        }
+
+        .modal-box h2 {
+            margin-top: 0;
+            font-size: 26px;
+        }
+
+        #btn-resetar {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #2ecc71;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        #btn-resetar:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="container">
+        <div class="placar">
+            <div>Jogador: <span id="pontosJogador">0</span></div>
+            <div>Computador: <span id="pontosMaquina">0</span></div>
+        </div>
+        <div id="botoes">
+            <button onclick="jogada('papel')">✋</button>
+            <button onclick="jogada('pedra')">✊</button>
+            <button onclick="jogada('tesoura')">✌️</button>
+        </div>
+        <div id='resultado'></div>
+        <div id="detalhes"></div>
+    </div>
+    <div id="modal-fim" class="modal-overlay">
+        <div class="modal-box">
+        <h2 id="texto-vencedor">Fim de Jogo!</h2>
+        <p id="placar-final"></p>
+        <button id="btn-resetar" onclick="resetarJogo()">Jogar Novamente 🔄</button>
+        </div>
+    </div>
+    <script>
+        let ptJogador = 0;
+        let ptMaquina = 0;
+
+        function jogada(escolha){
+            const opcoes = ['pedra','papel','tesoura'];
+
+            const aleatorio = Math.floor(Math.random()* 3);
+            const escolhaMaq = opcoes[aleatorio];
+
+            let mensagem = '';
+            let cor = '';
+
+
+            if(escolha == escolhaMaq){
+                mensagem = 'Deu empate';
+                cor = '#f1c40f';
+            }else if(
+                (escolha === 'pedra' && escolhaMaq === 'tesoura') ||
+                (escolha === 'tesoura' && escolhaMaq === 'papel') ||
+                (escolha === 'papel' && escolhaMaq === 'pedra')
+            ){
+                mensagem = 'Você Venceu'
+                cor = '#2ecc71';
+                ptJogador ++;
+            }else{
+                mensagem = 'O PC Ganhou'
+                cor = '#e74c3c';
+                ptMaquina ++;
+            }
+            const msgRes = document.getElementById('resultado')
+            msgRes.innerHTML = mensagem;
+            msgRes.style.color = cor;
+
+            document.getElementById('detalhes').textContent = `Você escolheu ${escolha} e o Pc escolheu 
+                    ${escolhaMaq}.`;
+            document.getElementById('pontosJogador').textContent = ptJogador;
+            document.getElementById('pontosMaquina').textContent = ptMaquina;
+
+            if(ptJogador === 5 || ptMaquina === 5){
+                mostrarFimDeJogo();
+            }
+        }
+        function mostrarFimDeJogo(){
+            const modal = document.getElementById('modal-fim');
+            const textoVencedor = document.getElementById('texto-vencedor');
+            const placarFinal = document.getElementById('placar-final');
+            
+            if (ptJogador === 5){
+                textoVencedor.textContent = 'Você Venceu a Partida! 🏆 ';
+                textoVencedor.style.color = '#2ecc71';
+            }else{
+                textoVencedor.textContent = 'O Computador Venceu! ';
+                textoVencedor.style.color= '#e74c3c';
+            }
+            placarFinal.textContent =`Placar Final: ${ptJogador} x ${ptMaquina}`;
+            modal.style.display ='flex';
+
+        }
+        function resetarJogo(){
+            ptJogador = 0;
+            ptMaquina = 0;
+            document.getElementById('pontosJogador').textContent = '0';
+            document.getElementById('pontosMaquina').textContent = '0';
+
+            const res = document.getElementById('resultado');
+            const det = document.getElementById('detalhes');
+
+            if (res) res.textContent ='';
+            if (det) det.textContent = '';
+
+            document.getElementById('modal-fim').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
